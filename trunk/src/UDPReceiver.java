@@ -15,6 +15,7 @@
  *******************************************************/
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -133,25 +134,50 @@ public class UDPReceiver extends Thread {
 	
 	public void run(){
 
+		/**
+		 * Utilisé pour l'instant :
+		 * http://www.faqs.org/rfcs/rfc1035.html
+		 * 
+		 * Peut être utile : 
+		 * http://www.netfor2.com/rfc1034.txt
+		 * http://www.faqs.org/rfcs/rfc1034.html (Même chose ou pas?)
+		 * http://www.netfor2.com/dns.htm
+		 */
 		try{
 			
 			//*Creation d'un socket UDP
+			DatagramSocket socket = new DatagramSocket(port);
 			
 			//*Boucle infinie de recpetion
 			while(true){
 				
 				//*Reception d'un paquet UDP via le socket
+				DatagramPacket p = null;
+				socket.receive(p);
 				
 				//*Creation d'un DataInputStream ou ByteArrayInputStream pour manipuler les bytes du paquet				
-
+				d = new DataInputStream(new ByteArrayInputStream(p.getData()));
+				
 				//*Lecture et sauvegarde des deux premier bytes, qui specifie l'identifiant
+				Byte[] id = new Byte[2];
+				id[1] = d.readByte();
+				id[2] = d.readByte();
+				
+				//GAB : Lecture du 1er BIT du 3e octet pour savoir si Query/Answer
+				//Query = 0 	Answer (response) = 1
+				//http://www.faqs.org/rfcs/rfc1035.html section 4.1.1.
+				Byte QR = d.readByte();
+				int query = QR>>7 & 0x0001;
 				
 				//*Lecture et sauvegarde du huitieme byte, qui specifie le nombre de reponse dans le message 
-
+				Byte response;
+				for (int i=4;i<8;i++)
+					d.readByte();
+				response = d.readByte();
 				
 				//*Dans le cas d'une reponse
-				
-
+				if (query==1)
+				{
 					//*Lecture du Query Domain name, a partir du 13 byte
 
 					//*Sauvegarde du Query Domain name
@@ -170,10 +196,11 @@ public class UDPReceiver extends Thread {
 					
 					//*Faire parvenir le paquet reponse au demandeur original, ayant emis une requete 
 					//*avec cet identifiant
-					
-
-				//*Dans le cas d'une requete
+				}
 				
+				//*Dans le cas d'une requete
+				if (query==0)
+				{
 					//*Lecture du Query Domain name, a partir du 13 byte
 					
 					//*Sauvegarde du Query Domain name
@@ -200,6 +227,7 @@ public class UDPReceiver extends Thread {
 							//*Placer ce paquet dans le socket
 					
 							//*Envoyer le paquet
+				}
 			}
 		}catch(Exception e){
 			System.err.println("Problème à l'exécution :");
