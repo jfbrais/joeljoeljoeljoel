@@ -53,23 +53,23 @@ public class ServeurDNS {
 		//Application des configurations par default
 		if(args[0].equals("default")){
 			if (args.length <= 1) {
-			UDPR.setSERVER_DNS("142.137.17.2");
-			f = new File("DNSFILE.TXT");
-			if(f.exists()){
-				UDPR.setDNSFile("DNSFILE.TXT");
-			}
-			else{
-				try {
-					f.createNewFile();
+				UDPR.setSERVER_DNS("142.137.17.2");
+				f = new File("DNSFILE.TXT");
+				if(f.exists()){
 					UDPR.setDNSFile("DNSFILE.TXT");
-				} catch (IOException e) {
-					e.printStackTrace();
 				}
-			}
-			UDPR.setRedirectionSeulement(false);
-			//lancement du thread
-			UDPR.start();
-			}
+				else{
+					try {
+						f.createNewFile();
+						UDPR.setDNSFile("DNSFILE.TXT");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				UDPR.setRedirectionSeulement(false);
+				//lancement du thread
+				UDPR.start();
+				}
 			else{
 				System.out.print("Cette commande n'a pas d'autre argument");
 			}
@@ -77,20 +77,20 @@ public class ServeurDNS {
 		
 		if(args[0].equals("showtable")){
 			if (args.length == 2) {
-			f = new File(args[1]);
-			if(f.exists()){
-				UDPR.setDNSFile(args[1]);
-			}
-			else{
-				try {
-					f.createNewFile();
+				f = new File(args[1]);
+				if(f.exists()){
 					UDPR.setDNSFile(args[1]);
-				} catch (IOException e) {
-					e.printStackTrace();
 				}
-				QF.listCorrespondingTable();
-				
-			}
+				else{
+					try {
+						f.createNewFile();
+						UDPR.setDNSFile(args[1]);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					QF.listCorrespondingTable();
+					
+				}
 			}
 			else{
 				System.out.println("vous n'avez pas indique le nom du fichier");
@@ -98,28 +98,28 @@ public class ServeurDNS {
 		}
 		else{
 			if (args.length == 3) {
-			UDPR.setSERVER_DNS(args[0]);
-			f = new File(args[1]);
-			if(f.exists()){
-				UDPR.setDNSFile(args[1]);
-			}
-			else{
-				try {
-					f.createNewFile();
+				UDPR.setSERVER_DNS(args[0]);
+				f = new File(args[1]);
+				if(f.exists()){
 					UDPR.setDNSFile(args[1]);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				if(args[2].equals("false")){
-					UDPR.setRedirectionSeulement(false);
 				}
 				else{
-					UDPR.setRedirectionSeulement(true);
+					try {
+						f.createNewFile();
+						UDPR.setDNSFile(args[1]);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					if(args[2].equals("false")){
+						UDPR.setRedirectionSeulement(false);
+					}
+					else{
+						UDPR.setRedirectionSeulement(true);
+					}
 				}
+				//lancement du thread
+				UDPR.start();
 			}
-			//lancement du thread
-			UDPR.start();
-		}
 			else{
 				System.out.println("Un argument est manquant!");
 			}
