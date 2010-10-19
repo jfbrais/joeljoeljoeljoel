@@ -13,6 +13,7 @@
  Date crée :         2007-03-10
  Date dern. modif.   X
  *******************************************************/
+
 public class UDPAnswerPacketCreator {
 	
 	int longueur;
