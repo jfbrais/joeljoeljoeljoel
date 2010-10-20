@@ -144,6 +144,9 @@ public class UDPReceiver extends Thread {
 		 * http://www.netfor2.com/dns.htm
 		 */
 		try{
+			//GAB :
+			byte[] buffer = new byte[7087];
+
 			
 			//*Creation d'un socket UDP
 			DatagramSocket socket = new DatagramSocket(port);
@@ -152,7 +155,7 @@ public class UDPReceiver extends Thread {
 			while(true){
 				
 				//*Reception d'un paquet UDP via le socket
-				DatagramPacket p = null;
+				DatagramPacket p = new DatagramPacket(buffer, buffer.length);
 				socket.receive(p);
 				
 				//*Creation d'un DataInputStream ou ByteArrayInputStream pour manipuler les bytes du paquet				
@@ -160,8 +163,8 @@ public class UDPReceiver extends Thread {
 				
 				//*Lecture et sauvegarde des deux premier bytes, qui specifie l'identifiant
 				Byte[] id = new Byte[2];
+				id[0] = d.readByte();
 				id[1] = d.readByte();
-				id[2] = d.readByte();
 				
 				//GAB : Lecture du 1er BIT du 3e octet pour savoir si Query/Answer
 				//Query = 0 	Answer (response) = 1
@@ -175,13 +178,17 @@ public class UDPReceiver extends Thread {
 					d.readByte();
 				response = d.readByte();
 				
+				System.out.println("\n");
 				//*Dans le cas d'une reponse
 				if (query==1)
 				{
 					//*Lecture du Query Domain name, a partir du 13 byte
-
-					//*Sauvegarde du Query Domain name
+					for (int i=9;i<13;i++)
+						d.readByte();
 					
+					//*Sauvegarde du Query Domain name
+					for (int i=13;i<23;i++)//lecture de 20 bytes, mais je sais pas de cb est le QDName
+						System.out.println(new String(new byte[]{(d.readByte())}));
 					
 					//*Passe par dessus Query Type et Query Class
 					//*Passe par dessus les premiers champs du ressource record pour arriver au ressource data
@@ -202,8 +209,12 @@ public class UDPReceiver extends Thread {
 				if (query==0)
 				{
 					//*Lecture du Query Domain name, a partir du 13 byte
+					for (int i=9;i<13;i++)
+						d.readByte();
 					
 					//*Sauvegarde du Query Domain name
+					for (int i=13;i<33;i++) //lecture de 20 bytes, mais je sais pas de cb est le QDName
+						System.out.println(new String(new byte[]{(d.readByte())}));
 					
 					//*Sauvegarde de l'adresse, du port et de l'identifiant de la requete
 					
