@@ -27,6 +27,9 @@ public class ServeurDNS {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+		args = new String[]{"default"};
+		
 		//logo
 		System.out.println("--------------------------------------");
 		System.out.println("Serveur DNS");
