@@ -183,7 +183,7 @@ public class UDPReceiver extends Thread {
 				response = d.readByte();
 				
 				//*Dans le cas d'une reponse
-				if (query==1)
+				if (query==1 && (int)response==1)
 				{
 					System.out.println("Q=1");
 					
@@ -207,17 +207,26 @@ public class UDPReceiver extends Thread {
 						nbchar = d.readByte();
 					}
 					
+					System.out.println(domainName);
+										
 					
 					//*Passe par dessus Query Type et Query Class
 					//*Passe par dessus les premiers champs du ressource record pour arriver au ressource data
 					//*qui contient l'adresse IP associe au hostname (dans le fond saut de 16 bytes)
 					for (int i=0;i<16;i++)
 						d.readByte();
-					
+										     
 					//*Capture de l'adresse IP
-					for (int i=0;i<16;i++)
-						System.out.println((int)d.readByte());
+					String address="";
+					for (int i=0;i<4;i++)
+					{
+						byte da = d.readByte();
+						address+=Integer.parseInt(Integer.toString((da & 0xff) + 0x100, 16).substring(1), 16);
+						if (i!=3)
+							address+=".";
+					}
 					
+						
 					//*Ajouter la correspondance dans le fichier seulement si une seule
 					//*reponse dans le message DNS (cette apllication ne traite que ce cas)
 					
@@ -260,14 +269,10 @@ public class UDPReceiver extends Thread {
 					int clientPort = p.getPort();
 					// Identifiant = id[] ?
 					
-					RedirectionSeulement=true;
 					//*Si le mode est redirection seulement
 					if (RedirectionSeulement)
 					{
-						//*Rediriger le paquet vers le serveur DNS
-						/**
-						 * Est supposé aller dans UDPSender.java... damnit.
-						 */						
+						//*Rediriger le paquet vers le serveur DNS	
 						socket.send(new DatagramPacket(packet, packet.length, InetAddress.getByName(SERVER_DNS), 53));
 					}
 					//*Sinon
@@ -279,6 +284,7 @@ public class UDPReceiver extends Thread {
 						//*Si la correspondance n'est pas trouvee
 							
 							//*Rediriger le paquet vers le serveur DNS
+							socket.send(new DatagramPacket(packet, packet.length, InetAddress.getByName(SERVER_DNS), 53));
 					
 						//*Sinon
 							//*Creer le paquet de reponse a l'aide du UDPAnswerPaquetCreator
