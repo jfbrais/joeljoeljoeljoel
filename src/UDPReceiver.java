@@ -145,7 +145,7 @@ public class UDPReceiver extends Thread {
 		 */
 		try{
 			//GAB :
-			byte[] buffer = new byte[65507];
+			byte[] buffer = new byte[BUF_SIZE];
 
 			
 			//*Creation d'un socket UDP
@@ -156,7 +156,9 @@ public class UDPReceiver extends Thread {
 				
 				//*Reception d'un paquet UDP via le socket
 				DatagramPacket p = new DatagramPacket(buffer, buffer.length);
+				System.out.println("Waiting to receive on : " + port);
 				socket.receive(p);
+				System.out.println("Received on : " + port);
 			    byte[] packet = new byte[p.getLength()];
 			    System.arraycopy(p.getData(), 0, packet, 0, p.getLength());
 				
@@ -180,7 +182,6 @@ public class UDPReceiver extends Thread {
 					d.readByte();
 				response = d.readByte();
 				
-				System.out.println("\n");
 				//*Dans le cas d'une reponse
 				if (query==1)
 				{
@@ -205,8 +206,6 @@ public class UDPReceiver extends Thread {
 						domainName += ".";
 						nbchar = d.readByte();
 					}
-					
-					System.out.println(domainName);
 					
 					
 					//*Passe par dessus Query Type et Query Class
@@ -257,6 +256,9 @@ public class UDPReceiver extends Thread {
 					/**
 					 * WTF ?!
 					 */
+					InetAddress clientIP = p.getAddress();
+					int clientPort = p.getPort();
+					// Identifiant = id[] ?
 					
 					RedirectionSeulement=true;
 					//*Si le mode est redirection seulement
@@ -266,18 +268,7 @@ public class UDPReceiver extends Thread {
 						/**
 						 * Est supposé aller dans UDPSender.java... damnit.
 						 */						
-						
-						DatagramSocket socketDNS = new DatagramSocket();
-						socketDNS.connect(InetAddress.getByName(SERVER_DNS), 53);
-						
-						UDPReceiver UDPR = new UDPReceiver();
-						System.out.println(socketDNS.getLocalPort());
-						UDPR.setport(socketDNS.getLocalPort());
-						UDPR.start();
-						
-						socketDNS.send(new DatagramPacket(packet, packet.length));
-						
-						System.out.println("Sent");
+						socket.send(new DatagramPacket(packet, packet.length, InetAddress.getByName(SERVER_DNS), 53));
 					}
 					//*Sinon
 					else
