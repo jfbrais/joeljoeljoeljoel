@@ -145,7 +145,7 @@ public class UDPReceiver extends Thread {
 		 */
 		try{
 			//GAB :
-			byte[] buffer = new byte[7087];
+			byte[] buffer = new byte[65507];
 
 			
 			//*Creation d'un socket UDP
@@ -157,10 +157,12 @@ public class UDPReceiver extends Thread {
 				//*Reception d'un paquet UDP via le socket
 				DatagramPacket p = new DatagramPacket(buffer, buffer.length);
 				socket.receive(p);
+			    byte[] packet = new byte[p.getLength()];
+			    System.arraycopy(p.getData(), 0, packet, 0, p.getLength());
 				
 				//*Creation d'un DataInputStream ou ByteArrayInputStream pour manipuler les bytes du paquet				
 				d = new DataInputStream(new ByteArrayInputStream(p.getData()));
-								
+				
 				//*Lecture et sauvegarde des deux premier bytes, qui specifie l'identifiant
 				Byte[] id = new Byte[2];
 				id[0] = d.readByte();
@@ -182,6 +184,9 @@ public class UDPReceiver extends Thread {
 				//*Dans le cas d'une reponse
 				if (query==1)
 				{
+					System.out.println("Q=1");
+					
+					
 					//*Lecture du Query Domain name, a partir du 13 byte
 					for (int i=9;i<13;i++)
 						d.readByte();
@@ -225,6 +230,9 @@ public class UDPReceiver extends Thread {
 				//*Dans le cas d'une requete
 				if (query==0)
 				{
+					System.out.println("Q=0");
+					
+					
 					//*Lecture du Query Domain name, a partir du 13 byte
 					for (int i=9;i<13;i++)
 						d.readByte();
@@ -249,12 +257,18 @@ public class UDPReceiver extends Thread {
 					/**
 					 * WTF ?!
 					 */
-
+					RedirectionSeulement=true;
 					//*Si le mode est redirection seulement
 					if (RedirectionSeulement)
 					{
 						//*Rediriger le paquet vers le serveur DNS
-						DatagramSocket socketDNS = new DatagramSocket(port, new InetAddress(SERVER_DNS));
+						/**
+						 * Est supposé aller dans UDPSender.java... damnit.
+						 */
+						DatagramSocket socketDNS = new DatagramSocket();
+						socketDNS.connect(InetAddress.getByName(SERVER_DNS), port);
+						socketDNS.send(new DatagramPacket(packet, packet.length));
+						System.out.println("Sent");
 					}
 					//*Sinon
 					else
