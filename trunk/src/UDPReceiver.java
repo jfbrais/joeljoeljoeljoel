@@ -229,10 +229,18 @@ public class UDPReceiver extends Thread {
 						
 					//*Ajouter la correspondance dans le fichier seulement si une seule
 					//*reponse dans le message DNS (cette apllication ne traite que ce cas)
+					QueryFinder finder = new QueryFinder(DNSFile);
+					if (finder.StartResearch(domainName).equals("none"))
+					{
+						AnswerRecorder recorder = new AnswerRecorder(DNSFile);
+						recorder.StartRecord(domainName, address);
+					}
 					
-					
-					//*Faire parvenir le paquet reponse au demandeur original, ayant emis une requete 
-					//*avec cet identifiant
+//					//*Faire parvenir le paquet reponse au demandeur original, ayant emis une requete 
+//					//*avec cet identifiant
+//					UDPAnswerPacketCreator answer = new UDPAnswerPacketCreator();
+//					byte[] toSend = answer.CreateAnswerPacket(packet, address);
+//					socket.send(new DatagramPacket(toSend, toSend.length, InetAddress.getByName(SERVER_DNS), 53));
 				}
 				
 				//*Dans le cas d'une requete
@@ -262,9 +270,6 @@ public class UDPReceiver extends Thread {
 					
 					
 					//*Sauvegarde de l'adresse, du port et de l'identifiant de la requete
-					/**
-					 * WTF ?!
-					 */
 					InetAddress clientIP = p.getAddress();
 					int clientPort = p.getPort();
 					// Identifiant = id[] ?
@@ -280,18 +285,27 @@ public class UDPReceiver extends Thread {
 					{
 						//*Rechercher l'adresse IP associe au Query Domain name dans le fichier de 
 						//*correspondance de ce serveur
-					
+						QueryFinder finder = new QueryFinder(DNSFile);
+						String address = finder.StartResearch(domainName);
 						//*Si la correspondance n'est pas trouvee
-							
+						if (address.equals("none"))
+						{
 							//*Rediriger le paquet vers le serveur DNS
 							socket.send(new DatagramPacket(packet, packet.length, InetAddress.getByName(SERVER_DNS), 53));
-					
+						}
 						//*Sinon
+						else
+						{
 							//*Creer le paquet de reponse a l'aide du UDPAnswerPaquetCreator
-					
+							UDPAnswerPacketCreator answer = new UDPAnswerPacketCreator();
+							byte[] toSend = answer.CreateAnswerPacket(packet, address);
+							DatagramPacket toSend2 = new DatagramPacket(toSend, toSend.length, clientIP, clientPort);
+							
 							//*Placer ce paquet dans le socket
-					
+							
 							//*Envoyer le paquet
+							socket.send(toSend2);
+						}
 					}
 				}
 			}
