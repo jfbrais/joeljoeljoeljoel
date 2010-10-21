@@ -56,7 +56,7 @@ public class ServeurDNS {
 		//Application des configurations par default
 		if(args[0].equals("default")){
 			if (args.length <= 1) {
-				UDPR.setSERVER_DNS("142.137.17.2");
+				UDPR.setSERVER_DNS("8.8.8.8");//UDPR.setSERVER_DNS("142.137.17.2");
 				f = new File("DNSFILE.TXT");
 				if(f.exists()){
 					UDPR.setDNSFile("DNSFILE.TXT");

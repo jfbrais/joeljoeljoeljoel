@@ -187,13 +187,32 @@ public class UDPReceiver extends Thread {
 						d.readByte();
 					
 					//*Sauvegarde du Query Domain name
+					int nbchar = d.readByte();
+					String domainName = "";
+					
+					while(nbchar != 0)
+					{
+						while(nbchar > 0) 
+						{
+							domainName += String.valueOf(Character.toChars(d.readByte()));
+							nbchar--;
+						}
+						domainName += ".";
+						nbchar = d.readByte();
+					}
+					
+					System.out.println(domainName);
+					
 					
 					//*Passe par dessus Query Type et Query Class
 					//*Passe par dessus les premiers champs du ressource record pour arriver au ressource data
 					//*qui contient l'adresse IP associe au hostname (dans le fond saut de 16 bytes)
-					
+					for (int i=0;i<16;i++)
+						d.readByte();
 					
 					//*Capture de l'adresse IP
+					for (int i=0;i<16;i++)
+						System.out.println((int)d.readByte());
 					
 					//*Ajouter la correspondance dans le fichier seulement si une seule
 					//*reponse dans le message DNS (cette apllication ne traite que ce cas)
@@ -225,15 +244,17 @@ public class UDPReceiver extends Thread {
 						nbchar = d.readByte();
 					}
 					
-					System.out.println(domainName);
 					
 					//*Sauvegarde de l'adresse, du port et de l'identifiant de la requete
-					
+					/**
+					 * WTF ?!
+					 */
 
 					//*Si le mode est redirection seulement
 					if (RedirectionSeulement)
 					{
 						//*Rediriger le paquet vers le serveur DNS
+						DatagramSocket socketDNS = new DatagramSocket(port, new InetAddress());
 					}
 					//*Sinon
 					else
