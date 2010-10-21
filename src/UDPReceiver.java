@@ -254,7 +254,7 @@ public class UDPReceiver extends Thread {
 					if (RedirectionSeulement)
 					{
 						//*Rediriger le paquet vers le serveur DNS
-						DatagramSocket socketDNS = new DatagramSocket(port, new InetAddress());
+						DatagramSocket socketDNS = new DatagramSocket(port, new InetAddress(SERVER_DNS));
 					}
 					//*Sinon
 					else
