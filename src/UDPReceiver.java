@@ -257,6 +257,7 @@ public class UDPReceiver extends Thread {
 					/**
 					 * WTF ?!
 					 */
+					
 					RedirectionSeulement=true;
 					//*Si le mode est redirection seulement
 					if (RedirectionSeulement)
@@ -264,10 +265,18 @@ public class UDPReceiver extends Thread {
 						//*Rediriger le paquet vers le serveur DNS
 						/**
 						 * Est supposé aller dans UDPSender.java... damnit.
-						 */
+						 */						
+						
 						DatagramSocket socketDNS = new DatagramSocket();
-						socketDNS.connect(InetAddress.getByName(SERVER_DNS), port);
+						socketDNS.connect(InetAddress.getByName(SERVER_DNS), 53);
+						
+						UDPReceiver UDPR = new UDPReceiver();
+						System.out.println(socketDNS.getLocalPort());
+						UDPR.setport(socketDNS.getLocalPort());
+						UDPR.start();
+						
 						socketDNS.send(new DatagramPacket(packet, packet.length));
+						
 						System.out.println("Sent");
 					}
 					//*Sinon
