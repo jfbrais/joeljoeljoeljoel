@@ -160,7 +160,7 @@ public class UDPReceiver extends Thread {
 				
 				//*Creation d'un DataInputStream ou ByteArrayInputStream pour manipuler les bytes du paquet				
 				d = new DataInputStream(new ByteArrayInputStream(p.getData()));
-				
+								
 				//*Lecture et sauvegarde des deux premier bytes, qui specifie l'identifiant
 				Byte[] id = new Byte[2];
 				id[0] = d.readByte();
@@ -187,8 +187,6 @@ public class UDPReceiver extends Thread {
 						d.readByte();
 					
 					//*Sauvegarde du Query Domain name
-					for (int i=13;i<23;i++)//lecture de 20 bytes, mais je sais pas de cb est le QDName
-						System.out.println(new String(new byte[]{(d.readByte())}));
 					
 					//*Passe par dessus Query Type et Query Class
 					//*Passe par dessus les premiers champs du ressource record pour arriver au ressource data
@@ -212,19 +210,34 @@ public class UDPReceiver extends Thread {
 					for (int i=9;i<13;i++)
 						d.readByte();
 					
-					//*Sauvegarde du Query Domain name
-					for (int i=13;i<33;i++) //lecture de 20 bytes, mais je sais pas de cb est le QDName
-						System.out.println(new String(new byte[]{(d.readByte())}));
+					//*Sauvegarde du Query Domain name					
+					int nbchar = d.readByte();
+					String domainName = "";
+					
+					while(nbchar != 0)
+					{
+						while(nbchar > 0) 
+						{
+							domainName += String.valueOf(Character.toChars(d.readByte()));
+							nbchar--;
+						}
+						domainName += ".";
+						nbchar = d.readByte();
+					}
+					
+					System.out.println(domainName);
 					
 					//*Sauvegarde de l'adresse, du port et de l'identifiant de la requete
 					
 
 					//*Si le mode est redirection seulement
-					
+					if (RedirectionSeulement)
+					{
 						//*Rediriger le paquet vers le serveur DNS
-					
+					}
 					//*Sinon
-						
+					else
+					{
 						//*Rechercher l'adresse IP associe au Query Domain name dans le fichier de 
 						//*correspondance de ce serveur
 					
@@ -238,6 +251,7 @@ public class UDPReceiver extends Thread {
 							//*Placer ce paquet dans le socket
 					
 							//*Envoyer le paquet
+					}
 				}
 			}
 		}catch(Exception e){
