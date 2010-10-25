@@ -28,7 +28,8 @@ public class ServeurDNS {
 	 */
 	public static void main(String[] args) {
 		
-		args = new String[]{"default"};
+		//args = new String[]{"8.8.8.8","DNSFILE.TXT","false"};
+		//args = new String[]{"showtable","DNSFILE.TXT"};
 		
 		//logo
 		System.out.println("--------------------------------------");
@@ -77,56 +78,56 @@ public class ServeurDNS {
 				System.out.print("Cette commande n'a pas d'autre argument");
 			}
 		}
-		
-		if(args[0].equals("showtable")){
-			if (args.length == 2) {
-				f = new File(args[1]);
-				if(f.exists()){
-					UDPR.setDNSFile(args[1]);
-				}
-				else{
-					try {
-						f.createNewFile();
-						UDPR.setDNSFile(args[1]);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					QF.listCorrespondingTable();
-					
-				}
-			}
-			else{
-				System.out.println("vous n'avez pas indique le nom du fichier");
-			}
-		}
-		else{
-			if (args.length == 3) {
-				UDPR.setSERVER_DNS(args[0]);
-				f = new File(args[1]);
-				if(f.exists()){
-					UDPR.setDNSFile(args[1]);
-				}
-				else{
-					try {
-						f.createNewFile();
-						UDPR.setDNSFile(args[1]);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					if(args[2].equals("false")){
-						UDPR.setRedirectionSeulement(false);
+		else
+		{
+			if(args[0].equals("showtable")){
+				if (args.length == 2) {
+					f = new File(args[1]);
+					if(f.exists()){
+						QF = new QueryFinder(args[1]);
 					}
 					else{
-						UDPR.setRedirectionSeulement(true);
+						try {
+							f.createNewFile();
+							QF = new QueryFinder(args[1]);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}
+					QF.listCorrespondingTable();
 				}
-				//lancement du thread
-				UDPR.start();
+				else{
+					System.out.println("Vous n'avez pas indique le nom du fichier");
+				}
 			}
 			else{
-				System.out.println("Un argument est manquant!");
+				if (args.length == 3) {
+					UDPR.setSERVER_DNS(args[0]);
+					f = new File(args[1]);
+					if(f.exists()){
+						UDPR.setDNSFile(args[1]);
+					}
+					else{
+						try {
+							f.createNewFile();
+							UDPR.setDNSFile(args[1]);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						if(args[2].equals("false")){
+							UDPR.setRedirectionSeulement(false);
+						}
+						else{
+							UDPR.setRedirectionSeulement(true);
+						}
+					}
+					//lancement du thread
+					UDPR.start();
+				}
+				else{
+					System.out.println("Argument(s) invalide(s)!");
+				}
 			}
 		}
-		
 	}
 }
