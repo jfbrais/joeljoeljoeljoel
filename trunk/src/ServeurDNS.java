@@ -1,21 +1,24 @@
-import java.io.File;
-import java.io.IOException;
-
 /******************************************************
  Laboratoire #3 : Programmation d'un serveur DNS
  
  Cours :             LOG610
- Session :           Hiver 2007
- Groupe :            01
- Projet :            Laboratoire #3
- Étudiant(e)(s) :    Maxime Bouchard
- Code(s) perm. :     BOUM24028309
- 
- Professeur :        Michel Lavoie 
- Nom du fichier :    Application.java
+ Session :           Automne 2010
+ Groupe :            02
+ Projet :            Laboratoire #4
+ Étudiant(e)(s) :    Gabriel Desmarais
+ 					 Jean-François Brais-Villemur
+ 					 Claude Bouchard
+ Code(s) perm. :     DESG24078908
+ 					 BRAJ14088901
+ 					 BOUC12018902
+ Chargée de lab. :   Fatna Belqasmi 
+ Nom du fichier :    ServeurDNS.java
  Date crée :         2007-03-10
- Date dern. modif.   X
+ Date dern. modif.   2010-10-27
  *******************************************************/
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Application principale qui lance les autres processus
  * @author Max
@@ -54,10 +57,9 @@ public class ServeurDNS {
 		
 		UDPR.setport(53);
 		
-		//Application des configurations par default
 		if(args[0].equals("default")){
 			if (args.length <= 1) {
-				UDPR.setSERVER_DNS("8.8.8.8");//UDPR.setSERVER_DNS("142.137.17.2");
+				UDPR.setSERVER_DNS("8.8.8.8");
 				f = new File("DNSFILE.TXT");
 				if(f.exists()){
 					UDPR.setDNSFile("DNSFILE.TXT");
@@ -71,7 +73,6 @@ public class ServeurDNS {
 					}
 				}
 				UDPR.setRedirectionSeulement(false);
-				//lancement du thread
 				UDPR.start();
 				}
 			else{
@@ -121,7 +122,6 @@ public class ServeurDNS {
 							UDPR.setRedirectionSeulement(true);
 						}
 					}
-					//lancement du thread
 					UDPR.start();
 				}
 				else{

@@ -2,16 +2,19 @@
  Laboratoire #3 : Programmation d'un serveur DNS
  
  Cours :             LOG610
- Session :           Hiver 2007
- Groupe :            01
- Projet :            Laboratoire #3
- Étudiant(e)(s) :    Maxime Bouchard
- Code(s) perm. :     BOUM24028309
- 
- Professeur :        Michel Lavoie 
+ Session :           Automne 2010
+ Groupe :            02
+ Projet :            Laboratoire #4
+ Étudiant(e)(s) :    Gabriel Desmarais
+ 					 Jean-François Brais-Villemur
+ 					 Claude Bouchard
+ Code(s) perm. :     DESG24078908
+ 					 BRAJ14088901
+ 					 BOUC12018902
+ Chargée de lab. :   Fatna Belqasmi 
  Nom du fichier :    QueryFinder.java
  Date crée :         2007-03-10
- Date dern. modif.   X
+ Date dern. modif.   2010-10-27
  *******************************************************/
 import java.io.FileNotFoundException;
 import java.io.FileReader;

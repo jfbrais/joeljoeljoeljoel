@@ -2,16 +2,19 @@
  Laboratoire #3 : Programmation d'un serveur DNS
  
  Cours :             LOG610
- Session :           Hiver 2007
- Groupe :            01
- Projet :            Laboratoire #3
- Étudiant(e)(s) :    Maxime Bouchard
- Code(s) perm. :     BOUM24028309
- 
- Professeur :        Michel Lavoie 
+ Session :           Automne 2010
+ Groupe :            02
+ Projet :            Laboratoire #4
+ Étudiant(e)(s) :    Gabriel Desmarais
+ 					 Jean-François Brais-Villemur
+ 					 Claude Bouchard
+ Code(s) perm. :     DESG24078908
+ 					 BRAJ14088901
+ 					 BOUC12018902
+ Chargée de lab. :   Fatna Belqasmi 
  Nom du fichier :    UDPReceiver.java
  Date crée :         2007-03-10
- Date dern. modif.   X
+ Date dern. modif.   2010-10-27
  *******************************************************/
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -32,8 +35,6 @@ import sun.io.Converters;
  * @author Max
  *
  */
-
-
 public class UDPReceiver extends Thread {
 	/**
 	 * Les champs d'un Packet UDP
@@ -135,30 +136,21 @@ public class UDPReceiver extends Thread {
 	public void run(){
 
 		/**
-		 * Utilisé pour l'instant :
+		 * Utilisation de la documentation sur les serveurs DNS contenue dans la RFC1035
 		 * http://www.faqs.org/rfcs/rfc1035.html
-		 * 
-		 * Peut être utile : 
-		 * http://www.netfor2.com/rfc1034.txt
-		 * http://www.faqs.org/rfcs/rfc1034.html (Même chose ou pas?)
-		 * http://www.netfor2.com/dns.htm
 		 */
 		try{
-			//GAB :
+			//Création du buffer de réception
 			byte[] buffer = new byte[BUF_SIZE];
 
-			
 			//*Creation d'un socket UDP
 			DatagramSocket socket = new DatagramSocket(port);
 			
 			//*Boucle infinie de recpetion
 			while(true){
-				
 				//*Reception d'un paquet UDP via le socket
 				DatagramPacket p = new DatagramPacket(buffer, buffer.length);
-				System.out.println("Waiting to receive on : " + port);
 				socket.receive(p);
-				System.out.println("Received on : " + port);
 			    byte[] packet = new byte[p.getLength()];
 			    System.arraycopy(p.getData(), 0, packet, 0, p.getLength());
 				
@@ -170,7 +162,7 @@ public class UDPReceiver extends Thread {
 				id[0] = d.readByte();
 				id[1] = d.readByte();
 				
-				//GAB : Lecture du 1er BIT du 3e octet pour savoir si Query/Answer
+				//Lecture du 1er BIT du 3e octet pour savoir si Query/Answer
 				//Query = 0 	Answer (response) = 1
 				//http://www.faqs.org/rfcs/rfc1035.html section 4.1.1.
 				Byte QR = d.readByte();
@@ -185,9 +177,6 @@ public class UDPReceiver extends Thread {
 				//*Dans le cas d'une reponse
 				if (query==1 && (int)response==1)
 				{
-					System.out.println("Q=1");
-					
-					
 					//*Lecture du Query Domain name, a partir du 13 byte
 					for (int i=9;i<13;i++)
 						d.readByte();
@@ -206,10 +195,7 @@ public class UDPReceiver extends Thread {
 						domainName += ".";
 						nbchar = d.readByte();
 					}
-					
-					System.out.println(domainName);
 										
-					
 					//*Passe par dessus Query Type et Query Class
 					//*Passe par dessus les premiers champs du ressource record pour arriver au ressource data
 					//*qui contient l'adresse IP associe au hostname (dans le fond saut de 16 bytes)
@@ -226,7 +212,6 @@ public class UDPReceiver extends Thread {
 							address+=".";
 					}
 					
-						
 					//*Ajouter la correspondance dans le fichier seulement si une seule
 					//*reponse dans le message DNS (cette apllication ne traite que ce cas)
 					QueryFinder finder = new QueryFinder(DNSFile);
@@ -235,20 +220,11 @@ public class UDPReceiver extends Thread {
 						AnswerRecorder recorder = new AnswerRecorder(DNSFile);
 						recorder.StartRecord(domainName, address);
 					}
-					
-//					//*Faire parvenir le paquet reponse au demandeur original, ayant emis une requete 
-//					//*avec cet identifiant
-//					UDPAnswerPacketCreator answer = new UDPAnswerPacketCreator();
-//					byte[] toSend = answer.CreateAnswerPacket(packet, address);
-//					socket.send(new DatagramPacket(toSend, toSend.length, InetAddress.getByName(SERVER_DNS), 53));
 				}
 				
 				//*Dans le cas d'une requete
 				if (query==0)
 				{
-					System.out.println("Q=0");
-					
-					
 					//*Lecture du Query Domain name, a partir du 13 byte
 					for (int i=9;i<13;i++)
 						d.readByte();
@@ -268,11 +244,9 @@ public class UDPReceiver extends Thread {
 						nbchar = d.readByte();
 					}
 					
-					
-					//*Sauvegarde de l'adresse, du port et de l'identifiant de la requete
+					//*Sauvegarde de l'adresse et du port de la requete
 					InetAddress clientIP = p.getAddress();
 					int clientPort = p.getPort();
-					// Identifiant = id[] ?
 					
 					//*Si le mode est redirection seulement
 					if (RedirectionSeulement)
@@ -299,12 +273,9 @@ public class UDPReceiver extends Thread {
 							//*Creer le paquet de reponse a l'aide du UDPAnswerPaquetCreator
 							UDPAnswerPacketCreator answer = new UDPAnswerPacketCreator();
 							byte[] toSend = answer.CreateAnswerPacket(packet, address);
-							DatagramPacket toSend2 = new DatagramPacket(toSend, toSend.length, clientIP, clientPort);
 							
-							//*Placer ce paquet dans le socket
-							
-							//*Envoyer le paquet
-							socket.send(toSend2);
+							//*Placer ce paquet dans le socket et envoyer le paquet
+							socket.send(new DatagramPacket(toSend, toSend.length, clientIP, clientPort));
 						}
 					}
 				}
